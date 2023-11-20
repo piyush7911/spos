@@ -1,0 +1,88 @@
+import java.util.*;
+
+public class PagingReplacement {
+    private static final int PAGE_FRAME_SIZE = 3;
+    private LinkedList<Integer> pageFrames = new LinkedList<>();
+
+    // LIFO Algorithm
+    public void simulateLIFO(List<Integer> pageReferences) {
+        System.out.println("LIFO Simulation:");
+        pageFrames.clear();
+
+        for (int page : pageReferences) {
+            pageFrames.remove(Integer.valueOf(page)); // Remove if page already exists
+            pageFrames.addFirst(page); // Add the current page to the beginning
+
+            if (pageFrames.size() > PAGE_FRAME_SIZE) {
+                pageFrames.removeLast(); // Remove the last-in page if the frame is full
+            }
+
+            System.out.println("Page Frames: " + pageFrames);
+        }
+    }
+
+    // Optimal Algorithm
+    public void simulateOptimal(List<Integer> pageReferences) {
+        System.out.println("\nOptimal Simulation:");
+        pageFrames.clear();
+
+        for (int i = 0; i < pageReferences.size(); i++) {
+            int page = pageReferences.get(i);
+            if (!pageFrames.contains(page)) {
+                if (pageFrames.size() < PAGE_FRAME_SIZE) {
+                    pageFrames.add(page); // Add to the page frames if there is space
+                } else {
+                    int optimalIndex = findOptimalIndex(pageReferences, i);
+                    pageFrames.set(optimalIndex, page); // Replace the page at the optimal index
+                }
+            }
+
+            System.out.println("Page Frames: " + pageFrames);
+        }
+    }
+
+    private int findOptimalIndex(List<Integer> pageReferences, int currentIndex) {
+        int farthestIndex = -1;
+        int farthestDistance = -1;
+
+        for (int i = 0; i < pageFrames.size(); i++) {
+            int page = pageFrames.get(i);
+            int nextPageIndex = pageReferences.subList(currentIndex, pageReferences.size()).indexOf(page);
+
+            if (nextPageIndex == -1) {
+                return i; // If a page will not be referenced again, replace it
+            }
+
+            if (nextPageIndex > farthestDistance) {
+                farthestDistance = nextPageIndex;
+                farthestIndex = i;
+            }
+        }
+
+        return farthestIndex;
+    }
+
+    public static void main(String[] args) {
+        PagingReplacement pagingSimulation = new PagingReplacement();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter page references separated by spaces:");
+        String input = scanner.nextLine();
+        List<Integer> pageReferences = parseInput(input);
+
+        pagingSimulation.simulateLIFO(pageReferences);
+        pagingSimulation.simulateOptimal(pageReferences);
+    }
+
+    private static List<Integer> parseInput(String input) {
+        String[] tokens = input.split("\\s+");
+        List<Integer> pageReferences = new ArrayList<>();
+
+        for (String token : tokens) {
+            pageReferences.add(Integer.parseInt(token));
+        }
+
+        return pageReferences;
+    }
+}
+

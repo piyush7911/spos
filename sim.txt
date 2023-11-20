@@ -1,0 +1,140 @@
+import java.util.*;
+
+class PagingSimulation {
+    private static final int PAGE_FRAME_SIZE = 3;
+    private LinkedList<Integer> pageFrames = new LinkedList<>();
+
+    public void simulateFIFO(List<Integer> pageReferences) {
+        System.out.println("FIFO Simulation:");
+        pageFrames.clear();
+
+        for (int page : pageReferences) {
+            if (!pageFrames.contains(page)) {
+                if (pageFrames.size() == PAGE_FRAME_SIZE) {
+                    pageFrames.removeFirst();
+                }
+                pageFrames.add(page);
+            }
+
+            System.out.println("Page Frames: " + pageFrames);
+        }
+    }
+
+    public void simulateLRU(List<Integer> pageReferences) {
+        System.out.println("\nLRU Simulation:");
+        pageFrames.clear();
+
+        for (int page : pageReferences) {
+            if (pageFrames.contains(page)) {
+                pageFrames.remove(Integer.valueOf(page));
+            } else if (pageFrames.size() == PAGE_FRAME_SIZE) {
+                pageFrames.removeFirst();
+            }
+
+            pageFrames.add(page);
+
+            System.out.println("Page Frames: " + pageFrames);
+        }
+    }
+
+    public static void main(String[] args) {
+        PagingSimulation pagingSimulation = new PagingSimulation();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter page references separated by spaces:");
+        String input = scanner.nextLine();
+        List<Integer> pageReferences = parseInput(input);
+
+        System.out.println("Choose Simulation:");
+        System.out.println("1. FIFO");
+        System.out.println("2. LRU");
+
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1:
+                pagingSimulation.simulateFIFO(pageReferences);
+                break;
+            case 2:
+                pagingSimulation.simulateLRU(pageReferences);
+                break;
+            default:
+                System.out.println("Invalid choice. Exiting.");
+        }
+    }
+
+    private static List<Integer> parseInput(String input) {
+        String[] tokens = input.split("\\s+");
+        List<Integer> pageReferences = new ArrayList<>();
+
+        for (String token : tokens) {
+            pageReferences.add(Integer.parseInt(token));
+        }
+
+        return pageReferences;
+    }
+}
+
+If you input "1 2 3 1 4 5" and choose FIFO simulation, the output will be:
+
+```
+FIFO Simulation:
+Page Frames: [1]
+Page Frames: [1, 2]
+Page Frames: [1, 2, 3]
+Page Frames: [2, 3, 4]
+Page Frames: [3, 4, 5]
+```
+
+Explanation:
+
+- Initially, pages 1, 2, and 3 are added to the page frames.
+- When page 1 is accessed again, the oldest page (1) is removed, and the new page (4) is added.
+- When page 4 is accessed, the oldest page (2) is removed, and the new page (5) is added.
+
+This represents the simulation of the FIFO (First In First Out) page replacement algorithm.
+
+Apologies for the confusion in my previous responses. I appreciate your patience. Let's go through the LRU simulation step by step:
+
+Input: 1 2 3 1 4 5
+
+```
+LRU Simulation:
+Page Frames: [1]
+Page Frames: [1, 2]
+Page Frames: [1, 2, 3]
+Page Frames: [2, 3, 1]
+Page Frames: [3, 1, 4]
+Page Frames: [1, 4, 5]
+```
+
+Your output is indeed correct. Here's a breakdown:
+
+- Initially, pages 1, 2, and 3 are added to the page frames.
+- When page 1 is accessed again, it becomes the most recently used, and the page frames remain unchanged.
+- When page 4 is accessed, the least recently used page (2) is removed, and the new page (4) is added.
+- When page 5 is accessed, the least recently used page (3) is removed, and the new page (5) is added.
+
+This represents the correct simulation of the LRU (Least Recently Used) page replacement algorithm based on the provided input.
+
+The LRU algorithm keeps track of the order in which pages are accessed and replaces the least recently used page when a new page needs to be brought into the limited page frames. In each step, the most recently used page is moved to the end of the page frames, ensuring that the least recently used page is always at the front and eligible for replacement.
+
+Certainly! Let's go through the FIFO (First In First Out) simulation step by step for the input "1 2 3 1 4 5" with a page frame size of 3:
+
+1. **Page 1 arrives:** Page Frames: [1]
+2. **Page 2 arrives:** Page Frames: [1, 2]
+3. **Page 3 arrives:** Page Frames: [1, 2, 3]
+4. **Page 1 arrives again:** Page 1 is already in the page frames, so no change. Page Frames: [1, 2, 3]
+5. **Page 4 arrives:** Page Frames: [2, 3, 4] (Page 1 is replaced because it is the oldest)
+6. **Page 5 arrives:** Page Frames: [3, 4, 5] (Page 2 is replaced because it is the oldest)
+
+So, the final state of the page frames after processing all the page references is [3, 4, 5]. This is how FIFO works—pages are replaced in the order they were originally added, and the oldest page is the first to be replaced when the page frame is full.
+
+In simple terms, paging simulation refers to the process of managing data in computer memory when it is not large enough to hold all the data needed by running programs. Imagine your computer's memory as a book, and each page of the book represents a small portion of the total memory.
+
+In a paging system, the memory is divided into fixed-size blocks called "pages," and the data or programs are also divided into these fixed-size pages. When a program needs to access data, the operating system loads the required pages into the available memory, and if there's not enough space, it has to decide which pages to keep and which to swap out.
+
+Paging simulation helps us understand and analyze different strategies for deciding which pages to keep in memory and which to swap out, known as "page replacement algorithms." Common algorithms include FIFO (First In First Out) and LRU (Least Recently Used), which determine which pages to remove based on their arrival order or how recently they were accessed.
+
+The goal of paging simulation is to efficiently use the available memory, minimize page faults (instances where the required page is not in memory), and optimize the overall performance of the computer system.
+

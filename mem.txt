@@ -1,0 +1,253 @@
+import java.util.Arrays;
+import java.util.Scanner;
+class first_fit
+{
+   void firstFit(int blockSize[], int m, int processSize[], int n)
+   {
+       int allocation[] = new int[n];
+       for (int i = 0; i < allocation.length; i++)
+           allocation[i] = -1;
+       for (int i = 0; i < n; i++)
+       {
+           for (int j = 0; j < m; j++)
+           {
+               if (blockSize[j] >= processSize[i])
+               {
+                   allocation[i] = j;
+                   blockSize[j] -= processSize[i];
+                   break;
+               }
+           }
+       }
+       System.out.println("\nProcess No.	Process Size	Block no.");
+       for (int i = 0; i < n; i++)
+       {
+           System.out.print(" " + (i+1) + "		" +
+                            processSize[i] + "		");
+           if (allocation[i] != -1)
+               System.out.print(allocation[i] + 1);
+           else
+               System.out.print("Not Allocated");
+           System.out.println();
+       }
+   }
+}
+class next_fit
+{
+   void NextFit(int blockSize[], int m, int processSize[], int n) {
+        int allocation[] = new int[n], j = 0;
+        Arrays.fill(allocation, -1);
+        for (int i = 0; i < n; i++) {
+            int count =0;
+            while (j < m) {
+                count++;    
+                if (blockSize[j] >= processSize[i]) {
+                    allocation[i] = j;
+                    blockSize[j] -= processSize[i];
+                    break;
+                }
+                j = (j + 1) % m;
+            }
+        }
+        System.out.print("\nProcess No.	Process Size	Block no.\n");
+        for (int i = 0; i < n; i++) {
+            System.out.print( i + 1 + "		" + processSize[i]
+                    + "		");
+            if (allocation[i] != -1) {
+                System.out.print(allocation[i] + 1);
+            } else {
+                System.out.print("Not Allocated");
+            }
+            System.out.println("");
+        }
+    }
+}
+class worst_fit
+{
+    void worstFit(int blockSize[], int m, int processSize[],
+                                                     int n)
+    {
+        int allocation[] = new int[n];
+        for (int i = 0; i < allocation.length; i++)
+            allocation[i] = -1;
+        for (int i=0; i<n; i++)
+        {
+            int wstIdx = -1;
+            for (int j=0; j<m; j++)
+            {
+                if (blockSize[j] >= processSize[i])
+                {
+                    if (wstIdx == -1)
+                        wstIdx = j;
+                    else if (blockSize[wstIdx] < blockSize[j])
+                        wstIdx = j;
+                }
+            }
+            if (wstIdx != -1)
+            {
+                allocation[i] = wstIdx;
+                blockSize[wstIdx] -= processSize[i];
+            }
+        }
+        System.out.println("\nProcess No.	Process Size	Block no.\n");
+        for (int i = 0; i < n; i++)
+        {
+            System.out.print("   " + (i+1) + "		" + processSize[i] + "		");
+            if (allocation[i] != -1)
+                System.out.print(allocation[i] + 1);
+            else
+                System.out.print("Not Allocated");
+            System.out.println();
+        }
+    }
+}
+class best_fit
+{
+    void bestFit(int blockSize[], int m, int processSize[], int n)
+    {
+        int allocation[] = new int[n];
+        for (int i = 0; i < allocation.length; i++)
+            allocation[i] = -1;
+        for (int i=0; i<n; i++)
+        {
+            int bestIdx = -1;
+            for (int j=0; j<m; j++)
+            {
+                if (blockSize[j] >= processSize[i])
+                {
+                    if (bestIdx == -1)
+                        bestIdx = j;
+                    else if (blockSize[bestIdx] > blockSize[j])
+                        bestIdx = j;
+                }
+            }
+            if (bestIdx != -1)
+            {
+                allocation[i] = bestIdx;
+                blockSize[bestIdx] -= processSize[i];
+            }
+        }
+        System.out.println("\nProcess No.	Process Size	Block no.\n");
+        for (int i = 0; i < n; i++)
+        {
+            System.out.print("   " + (i+1) + "		" + processSize[i] + "		");
+            if (allocation[i] != -1)
+                System.out.print(allocation[i] + 1);
+            else
+                System.out.print("Not Allocated");
+            System.out.println();
+        }
+    }
+}
+public class Main {
+   public static void main(String[] args){
+       first_fit first = new first_fit();
+       next_fit next = new next_fit();
+       worst_fit worst = new worst_fit();
+       best_fit best = new best_fit();
+       Scanner scan = new Scanner(System.in);
+       while(true){
+           int choice;
+           System.out.println();
+           System.out.println("Enter the number of Blocks: ");
+           int m = scan.nextInt();
+           System.out.println("Enter the number of Processes: ");
+           int n = scan.nextInt();
+           int blockSize[] = new int[m];
+           int processSize[] = new int[n];
+           System.out.println("Enter the Size of all the blocks: ");
+           for (int i = 0; i<m; i++){
+               blockSize[i] = scan.nextInt();
+           }
+           System.out.println("Enter the size of all processes: ");
+           for (int i = 0; i<n; i++){
+               processSize[i] = scan.nextInt();
+           }
+           System.out.println();
+           System.out.println("Menu");
+           System.out.println("1. First Fit ");
+           System.out.println("2. Next Fit");
+           System.out.println("3. Worst Fit");
+           System.out.println("4. Best Fit");
+           System.out.println("5. exit");
+           System.out.println("Select the algorithm you want to implement: ");
+           choice = scan.nextInt();
+           switch(choice){
+               case 1:
+                   System.out.println("First Fit Output");
+                   first.firstFit(blockSize, m, processSize, n);
+                   break;
+               case 2:
+                   System.out.println("Next Fit Output");
+                   next.NextFit(blockSize, m, processSize, n);
+                   break;
+               case 3:
+                   System.out.println("Worst Fit Output");
+                   worst.worstFit(blockSize, m, processSize, n);
+                   break;
+               case 4:
+                   System.out.println("Best Fit Output");
+                   best.bestFit(blockSize, m, processSize, n);
+                   break;
+               case 5:
+                   System.out.println("Exiting the code...");
+                   return;
+               default:
+                   System.out.println("Invalid option");
+           }
+       }
+   }
+}
+
+Memory placement strategies are used by operating systems to allocate and deallocate memory for processes. Here are brief explanations of the mentioned memory placement strategies:
+
+1. **First Fit:**
+   - **Description:** The first fit algorithm allocates the first available block of memory that is large enough to accommodate the process.
+   - **Advantages:** Simple and quick.
+   - **Disadvantages:** Can lead to fragmentation, both external and internal.
+
+2. **Worst Fit:**
+   - **Description:** The worst fit algorithm allocates the largest available block of memory to a process. This is done in the hope that it will leave behind smaller blocks for future processes.
+   - **Advantages:** May reduce external fragmentation.
+   - **Disadvantages:** Inefficient in terms of space utilization and may lead to more wasted memory.
+
+3. **Best Fit:**
+   - **Description:** The best fit algorithm allocates the smallest available block of memory that is large enough for the process. The goal is to use memory more efficiently and minimize wasted space.
+   - **Advantages:** Can lead to less external fragmentation and better space utilization.
+   - **Disadvantages:** May require more time to find a suitable block of memory.
+
+4. **Next Fit:**
+   - **Description:** Similar to first fit, but the starting point for allocation is the location where the last allocation occurred. It continues searching from that point until it finds a suitable block of memory.
+   - **Advantages:** Reduces fragmentation compared to first fit.
+   - **Disadvantages:** Can still result in fragmentation, and the efficiency depends on the order of process arrivals.
+
+Each memory placement strategy has its own set of advantages and disadvantages. The choice of which strategy to use depends on factors such as system requirements, the nature of the processes, and the goals of the memory management system. Some modern operating systems may use a combination of these strategies or dynamic approaches to adapt to changing conditions and improve overall performance.
+
+The main difference between the "worst fit" and "first fit" memory allocation strategies lies in how they select and allocate memory blocks to processes:
+
+1. **Worst Fit:**
+   - **Selection Criteria:** Allocates the largest available block of memory to a process.
+   - **Goal:** Aims to leave behind larger blocks of free memory, anticipating that they may be suitable for future processes.
+   - **Advantages:** May reduce external fragmentation by keeping larger blocks for future allocations.
+   - **Disadvantages:** Inefficient in terms of space utilization, as it tends to leave behind more wasted memory. It may take longer to find a suitable block.
+
+2. **First Fit:**
+   - **Selection Criteria:** Allocates the first available block of memory that is large enough to accommodate the process.
+   - **Goal:** Simple and quick allocation strategy.
+   - **Advantages:** Fast and easy to implement. Can quickly find a suitable block for a process.
+   - **Disadvantages:** May lead to fragmentation (both internal and external) as it may not always choose the optimal block.
+
+
+3. **Best Fit:**
+   - **Selection Criteria:** Allocates the smallest available block of memory that is large enough to accommodate the process.
+   - **Goal:** Aims to minimize wasted memory and external fragmentation by using the smallest suitable block.
+   - **Advantages:** Can lead to efficient space utilization, reducing external fragmentation.
+   - **Disadvantages:** May take more time to find a suitable block compared to other strategies.
+
+4. **Next Fit:**
+   - **Selection Criteria:** Similar to first fit, allocates the first available block of memory that is large enough for the process. However, it starts the search from the location where the last allocation occurred, instead of always starting from the beginning.
+   - **Goal:** Reduces fragmentation compared to first fit by continuing the search from the last allocation point.
+   - **Advantages:** Can be more efficient than first fit in terms of reducing fragmentation. Simpler than some other strategies.
+   - **Disadvantages:** May still result in fragmentation, and the efficiency depends on the order of process arrivals.
+
+

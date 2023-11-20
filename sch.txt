@@ -1,0 +1,255 @@
+import java.util.*;
+class process {
+  public int id, at, bt, wt, tat, rt, st, ct, rest, priority;
+}
+class prog {
+  public static void main(String[] args) {
+    prog obj = new prog();
+    Scanner sc = new Scanner(System.in);
+    int nop;
+
+    System.out.println("Enter no of processes");
+    nop = sc.nextInt();
+    process pro[] = new process[nop];
+    for (int i = 0; i < nop; i++) {
+      int at, bt;
+      System.out.print("Arrival time of process " + i + " : ");
+      at = sc.nextInt();
+      System.out.print("Burst time of process " + i + " : ");
+      bt = sc.nextInt();
+
+      pro[i] = new process();
+      pro[i].id = i;
+      pro[i].at = at;
+      pro[i].bt = bt;
+      pro[i].rt = bt;
+    }
+    int choice;
+    do {
+      System.out.println("\nMenu");
+      System.out.println("1. FCFS");
+      System.out.println("2. SJF");
+      System.out.println("3. Round Robin");
+      System.out.println("4. Priority");
+      System.out.println("5. Exit");
+      System.out.print("Enter your choice: ");
+      choice = sc.nextInt();
+      switch (choice) {
+      case 1:
+        obj.fcfs(nop, pro);
+        break;
+      case 2:
+        obj.sjf(nop, pro);
+        break;
+      case 3:
+        obj.roundRobin(nop, pro);
+        break;
+      case 4:
+        obj.priorityScheduling(nop, pro);
+        break;
+      case 5:
+        System.out.println("Exiting...");
+        System.exit(0);
+        break;
+      default:
+        System.out.println("Invalid choice");
+      }
+    } while (choice != 5);
+  }
+  void fcfs(int nop, process pro[]) {
+
+    process temp;
+    for (int i = 0; i < nop - 1; i++) {
+      for (int j = i + 1; j < nop; j++) {
+        if (pro[i].at > pro[j].at) {
+
+          temp = pro[i];
+          pro[i] = pro[j];
+          pro[j] = temp;
+        }
+        if (pro[i].at == pro[j].at) {
+          if (pro[i].bt > pro[j].bt) {
+
+            temp = pro[i];
+            pro[i] = pro[j];
+            pro[j] = temp;
+          }
+        }
+      }
+    }
+    int time = 0;
+
+    for (int i = 0; i < nop; i++) {
+      while (pro[i].at > time) {
+        time++;
+      }
+      pro[i].st = time;
+      time += pro[i].bt;
+      pro[i].ct = time;
+      pro[i].wt = pro[i].st - pro[i].at;
+      pro[i].tat = pro[i].wt + pro[i].bt;
+      pro[i].rest = pro[i].wt;
+    }
+    print(nop, pro);
+  }
+  void sjf(int nop, process pro[]) {
+
+    int time = 0;
+    int completed = 0;
+    int currentProcess = -1; // Index of the currently running process
+
+    while (completed < nop) {
+        int shortestBurstTime = Integer.MAX_VALUE;
+        int nextProcess = -1;
+
+        for (int i = 0; i < nop; i++) {
+            if (pro[i].at <= time && pro[i].rt > 0) {
+                if (pro[i].rt < shortestBurstTime) {
+                    shortestBurstTime = pro[i].rt;
+                    nextProcess = i;
+                }
+            }
+        }
+
+        if (nextProcess == -1) {
+            time++;
+            continue;
+        }
+
+        if (currentProcess != nextProcess) {
+            pro[nextProcess].st = time;
+        }
+
+        pro[nextProcess].rt--;
+
+        if (pro[nextProcess].rt == 0) {
+            completed++;
+            pro[nextProcess].ct = time + 1;
+            pro[nextProcess].tat = pro[nextProcess].ct - pro[nextProcess].at;
+            pro[nextProcess].wt = pro[nextProcess].tat - pro[nextProcess].bt;
+        }
+
+        currentProcess = nextProcess;
+        time++;
+    }
+
+    print(nop, pro);
+  }
+
+  void roundRobin(int nop, process pro[]) {
+    Scanner sc = new Scanner(System.in);
+    System.out.print("Enter time quantum: ");
+    int quantum = sc.nextInt();
+    int rem_bt[] = new int[nop];
+    for (int i = 0; i < nop; i++) {
+      rem_bt[i] = pro[i].bt;
+    }
+    int t = 0;
+    while (true) {
+      boolean done = true;
+      for (int i = 0; i < nop; i++) {
+        if (rem_bt[i] > 0) {
+          done = false;
+          if (rem_bt[i] > quantum) {
+            t += quantum;
+            rem_bt[i] -= quantum;
+          } else {
+            t = t + rem_bt[i];
+            pro[i].ct = t;
+            rem_bt[i] = 0;
+          }
+        }
+      }
+      if (done == true)
+        break;
+    }
+
+    for (int i = 0; i < nop; i++) {
+      pro[i].tat = pro[i].ct - pro[i].at;
+      pro[i].wt = pro[i].tat - pro[i].bt;
+    }
+    print(nop, pro);
+  }
+  void priorityScheduling(int nop, process pro[]) {
+    Scanner sc = new Scanner(System.in);
+    for (int i = 0; i < nop; i++) {
+      System.out.print("Enter priority for process " + (i + 1) + ": ");
+      pro[i].priority = sc.nextInt();
+    }
+
+    process temp;
+    for (int i = 0; i < nop - 1; i++) {
+      for (int j = i + 1; j < nop; j++) {
+        if (pro[i].priority > pro[j].priority) {
+          temp = pro[i];
+          pro[i] = pro[j];
+          pro[j] = temp;
+        }
+      }
+    }
+    int time = 0;
+    for (int i = 0; i < nop; i++) {
+      while (pro[i].at > time) {
+        time++;
+      }
+      pro[i].st = time;
+      time += pro[i].bt;
+      pro[i].ct = time;
+      pro[i].tat = pro[i].ct - pro[i].at;
+      pro[i].wt = pro[i].tat - pro[i].bt;
+    }
+    print(nop, pro);
+  }
+  static void print(int nop, process pro[]) {
+    process sum = new process();
+    System.out.println(" id at bt wt tat ");
+    for (int i = 0; i < nop; i++) {
+      System.out.println(" " + pro[i].id + " " + pro[i].at + " " + pro[i].bt + "	" + pro[i].wt + "	" +
+        pro[i].tat + "  ");
+      sum.wt += pro[i].wt;
+    }
+    System.out.println("Average wait time = " + sum.wt / nop);
+  }
+}
+
+Scheduling algorithms are used in computer systems to manage the execution of processes or tasks. These algorithms determine the order in which processes are executed by the CPU. The goal is to maximize system performance, throughput, and responsiveness. Different scheduling algorithms have different criteria and priorities, and they can be classified into various types. Here are some common scheduling algorithms
+The choice of scheduling algorithm depends on the specific requirements and characteristics of the system and the applications running on it. Different algorithms are suitable for different scenarios, and there is often a trade-off between simplicity, fairness, and efficiency.
+
+Schedulers are a crucial component of operating systems, responsible for managing the execution of processes and allocating system resources. There are different types of schedulers, each serving a specific purpose. Here are the main types:
+
+1. **Long-Term Scheduler (Job Scheduler):** This scheduler determines which processes in the job pool (waiting processes) should be brought into the ready queue (those that are ready to execute). Its goal is to maintain a mix of processes in the ready queue to optimize overall system performance. The long-term scheduler is invoked less frequently compared to other types of schedulers.
+
+2. **Medium-Term Scheduler:** Sometimes referred to as the "Swapper," this scheduler is responsible for swapping processes in and out of the main memory (RAM) to and from the secondary storage (e.g., hard disk). It helps in reducing the degree of multiprogramming when the number of processes in memory exceeds a certain limit. Swapping allows the system to better utilize memory resources.
+
+3. **Short-Term Scheduler (CPU Scheduler):** This scheduler, also known as the CPU scheduler, determines which process in the ready queue should be executed by the CPU next. It makes decisions in a relatively short time frame, often measured in milliseconds or microseconds. The primary goal is to optimize CPU utilization, throughput, and response time.
+
+In short, scheduling algorithms are rules or strategies used to determine the order in which processes are executed by the CPU, optimizing system performance. Schedulers, on the other hand, are components of the operating system that implement these algorithms. Schedulers include long-term schedulers (job schedulers), medium-term schedulers, and short-term schedulers (CPU schedulers), each serving a specific purpose in managing processes and system resources. In essence, scheduling algorithms are the strategies, while schedulers are the implementations of these strategies within an operating system.
+
+
+Certainly! Here's a brief overview of the working process for each scheduling algorithm:
+
+1. **First-Come, First-Served (FCFS):**
+   - Processes are executed in the order they arrive in the ready queue.
+   - The process at the front of the queue is selected and given control of the CPU.
+   - It continues to execute until it completes or gets blocked, allowing the next process in the queue to run.
+
+2. **Round Robin (RR):**
+   - Each process is assigned a fixed time slice or quantum.
+   - The scheduler selects the first process in the ready queue.
+   - The selected process runs for its allotted time slice.
+   - If the process completes within the time slice, it's removed; otherwise, it's moved to the end of the queue.
+   - The scheduler moves to the next process in the queue, and the cycle repeats.
+
+3. **Shortest Job First (SJF) Preemptive:**
+   - The scheduler selects the process with the shortest burst time remaining whenever a scheduling decision is made.
+   - If a new process arrives with a shorter burst time than the currently running process, preemption occurs.
+   - The newly arrived process gets the CPU, and the previous process is moved to the ready queue.
+
+4. **Priority Scheduling (Non-Preemptive):**
+   - Each process is assigned a priority value.
+   - The scheduler selects the process with the highest priority.
+   - The selected process runs until it completes or is blocked.
+   - After completion or blocking, the next process with the highest priority is selected.
+
+These are simplified descriptions, and in real-world scenarios, additional considerations such as aging (gradual increase in priority over time) and priority adjustments may be involved. The specific implementation details can vary based on the operating system and its scheduling policies.
+
